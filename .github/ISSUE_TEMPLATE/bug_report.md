@@ -1,38 +1,29 @@
 ---
-name: Bug report
-about: Create a report to help us improve
+name: VSCODL2 bug report
+about: Report a reproducible problem in VSCODL2
 title: ''
 labels: ''
 assignees: ''
 
 ---
 
-**Describe the bug**
-A clear and concise description of what the bug is.
+**VSCODL2 version**
+State the version shown in the installed application or release filename.
 
-**To Reproduce**
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+**Windows version**
+State the Windows version and architecture.
 
-**Expected behavior**
-A clear and concise description of what you expected to happen.
+**Steps to reproduce**
+List the gallery URL pattern and the exact actions that trigger the problem. Remove private account details before posting.
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
+**Expected result**
+Describe what VSCODL2 should have done.
 
-**Desktop (please complete the following information):**
- - OS: [e.g. iOS]
- - Browser [e.g. chrome, safari]
- - Version [e.g. 22]
+**Actual result**
+Describe what happened instead.
 
-**Smartphone (please complete the following information):**
- - Device: [e.g. iPhone6]
- - OS: [e.g. iOS8.1]
- - Browser [e.g. stock browser, safari]
- - Version [e.g. 22]
+**Diagnostics**
+Attach the relevant contents of `data/last-error.log` or `data/browser-console.log`. Remove private information first.
 
-**Additional context**
-Add any other context about the problem here.
+**Screenshots or additional context**
+Add anything else needed to reproduce the problem.

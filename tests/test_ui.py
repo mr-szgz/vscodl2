@@ -10,6 +10,7 @@ def test_initial_ui_is_ready_for_manual_browser_session(qtbot, tmp_path, monkeyp
     window.show()
 
     assert window.windowTitle() == "VSCODL2"
+    assert window.url.text() == ""
     assert window.open_button.text() == "Open browser session"
     assert not window.confirm_button.isEnabled()
     assert not window.download_button.isEnabled()
@@ -28,7 +29,6 @@ def test_scanned_event_populates_results(qtbot, tmp_path, monkeypatch):
                 "media_id": "fixture",
                 "media_type": "Image",
                 "url": "https://media.test/fixture.jpg",
-                "preview_url": "https://media.test/preview.jpg",
                 "filename": "fixture.jpg",
                 "width": 100,
                 "height": 200,

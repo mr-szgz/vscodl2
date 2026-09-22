@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "vscodl2"
-version = "2.2.1"
+version = "2.2.2"
 description = "A Qt and Playwright desktop downloader for user-controlled VSCO gallery sessions"
 readme = "README.md"
 license = "MIT"

@@ -1,6 +1,5 @@
 from dataclasses import asdict
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
-from pathlib import Path
 import threading
 import json
 from types import SimpleNamespace
@@ -20,6 +19,7 @@ from vscodl2.core import (
     original_image_url,
     is_gallery_page,
 )
+from vscodl2 import __version__
 
 
 def api_entry(*, video=False):
@@ -53,11 +53,10 @@ def test_media_item_from_video_api():
 
     assert item.media_type == "Video"
     assert item.url == "https://video.vsco.test/media/abc123.mp4"
-    assert item.preview_url == "https://im.vsco.test/media/abc123.jpg"
 
 
 def test_gallery_helpers():
-    assert gallery_name("https://vsco.co/-evalee/gallery") == "-evalee"
+    assert gallery_name("https://vsco.co/fixture/gallery") == "fixture"
     assert absolute_media_url("//im.vsco.co/file.jpg") == "https://im.vsco.co/file.jpg"
 
 
@@ -72,6 +71,7 @@ def test_download_media_uses_username_photo_directory(tmp_path):
 
     class Handler(BaseHTTPRequestHandler):
         def do_GET(self):
+            self.server.user_agent = self.headers["User-Agent"]
             self.send_response(200)
             self.send_header("Content-Length", str(len(payload)))
             self.end_headers()
@@ -87,7 +87,6 @@ def test_download_media_uses_username_photo_directory(tmp_path):
         media_id="fixture",
         media_type="Image",
         url=f"http://127.0.0.1:{server.server_port}/fixture.png",
-        preview_url="",
         filename="fixture_original.png",
         width=2560,
         height=1440,
@@ -96,9 +95,6 @@ def test_download_media_uses_username_photo_directory(tmp_path):
     )
     events = []
     job = Job("https://vsco.co/fixture/gallery", str(tmp_path))
-    job.download_path.mkdir(parents=True)
-    legacy = job.download_path / "fixture.png"
-    legacy.write_bytes(b"existing preview")
 
     download_media(job, [asdict(item)], events.append, Control())
     server.shutdown()
@@ -107,7 +103,7 @@ def test_download_media_uses_username_photo_directory(tmp_path):
     assert destination.read_bytes() == payload
     result = QImage(str(destination))
     assert (result.width(), result.height()) == (2560, 1440)
-    assert legacy.read_bytes() == b"existing preview"
+    assert server.user_agent == f"VSCODL2/{__version__}"
     assert events[-1] == {"type": "done", "stopped": False}
 
 
@@ -116,7 +112,6 @@ def test_download_media_uses_video_directory_and_skips_existing_file(tmp_path):
         media_id="fixture",
         media_type="Video",
         url="https://example.test/fixture.mp4",
-        preview_url="",
         filename="fixture_original.mp4",
         width=1920,
         height=1080,
@@ -168,7 +163,6 @@ def test_preloaded_photo_and_video_keep_source_resolution():
     item = MediaItem.from_preloaded("abc", photo)
     assert item.url == "https://image.vsco.co/1/abc/photo.jpg"
     assert (item.width, item.height) == (4032, 3024)
-    assert item.preview_url.endswith("?w=320")
     photo.update(isVideo=True, videoUrl="//video.vsco.co/abc.mp4?token=x%2Fy")
     video = MediaItem.from_preloaded("abc", photo)
     assert video.url == "https://video.vsco.co/abc.mp4?token=x%2Fy"

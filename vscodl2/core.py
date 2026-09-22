@@ -15,6 +15,8 @@ from urllib.parse import unquote_plus, urlsplit, urlunsplit
 import requests
 from playwright.sync_api import sync_playwright
 
+from . import __version__
+
 
 CHROME_PATH = Path(r"C:\Program Files\Google\Chrome\Application\chrome.exe")
 
@@ -24,7 +26,6 @@ class MediaItem:
     media_id: str
     media_type: str
     url: str
-    preview_url: str
     filename: str
     width: int
     height: int
@@ -39,7 +40,6 @@ class MediaItem:
         media_url = absolute_media_url(media_url)
         if not is_video:
             media_url = original_image_url(media_url)
-        preview_url = absolute_media_url(payload["responsive_url"])
         media_type = "Video" if is_video else "Image"
         suffix = Path(urlsplit(media_url).path).suffix or (".mp4" if is_video else ".jpg")
         media_id = payload["_id"]
@@ -47,7 +47,6 @@ class MediaItem:
             media_id=media_id,
             media_type=media_type,
             url=media_url,
-            preview_url=preview_url,
             filename=f"{payload['upload_date']}_{media_id}_original{suffix}",
             width=payload["width"],
             height=payload["height"],
@@ -66,7 +65,6 @@ class MediaItem:
             media_id=media_id,
             media_type="Video" if is_video else "Image",
             url=url,
-            preview_url=absolute_media_url(payload["responsiveUrl"]),
             filename=f"{payload['uploadDate']}_{media_id}_original{suffix}",
             width=payload["width"],
             height=payload["height"],
@@ -357,7 +355,7 @@ def download_media(job, item_values, emit, control):
     with requests.Session() as session:
         session.headers.update(
             {
-                "User-Agent": "VSCODL2/2.1",
+                "User-Agent": f"VSCODL2/{__version__}",
                 "Referer": job.gallery_url,
                 "Accept-Encoding": "identity",
             }

@@ -1,20 +1,20 @@
 ---
-name: Feature request
-about: Suggest an idea for this project
+name: VSCODL2 feature request
+about: Suggest an improvement to VSCODL2
 title: ''
 labels: ''
 assignees: ''
 
 ---
 
-**Is your feature request related to a problem? Please describe.**
-A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
+**Problem**
+Describe the VSCODL2 workflow or limitation this request would improve.
 
-**Describe the solution you'd like**
-A clear and concise description of what you want to happen.
+**Proposed behavior**
+Describe what VSCODL2 should do.
 
-**Describe alternatives you've considered**
-A clear and concise description of any alternative solutions or features you've considered.
+**Example workflow**
+List the steps a user would take with the proposed behavior.
 
 **Additional context**
-Add any other context or screenshots about the feature request here.
+Add relevant screenshots, examples, or constraints.

@@ -67,7 +67,7 @@ class MainWindow(QMainWindow):
 
         title = QLabel("VSCODL2")
         title.setObjectName("title")
-        subtitle = QLabel("User-controlled Chromium scanning for VSCO galleries")
+        subtitle = QLabel("User-controlled Google Chrome scanning for VSCO galleries")
         subtitle.setObjectName("subtitle")
         layout.addWidget(title)
         layout.addWidget(subtitle)
@@ -82,7 +82,7 @@ class MainWindow(QMainWindow):
         session_layout.addWidget(step)
 
         source_row = QHBoxLayout()
-        self.url = QLineEdit("https://vsco.co/-evalee/gallery")
+        self.url = QLineEdit()
         self.url.setAccessibleName("VSCO gallery URL")
         self.url.setPlaceholderText("https://vsco.co/username/gallery")
         self.url.returnPressed.connect(self.open_browser)
@@ -301,7 +301,7 @@ class MainWindow(QMainWindow):
         elif event_type == "done" and self.operation == "download":
             self.set_status(f"Downloads complete: {self.download_path()}", "success")
 
-    def _worker_finished(self, exit_code, exit_status):
+    def _worker_finished(self, exit_code, _exit_status):
         self._read_stdout()
         self._read_stderr()
         self.confirm_button.setEnabled(False)

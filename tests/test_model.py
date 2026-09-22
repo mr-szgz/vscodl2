@@ -11,7 +11,6 @@ def item(media_id, media_type):
         media_id=media_id,
         media_type=media_type,
         url=f"https://media.test/{media_id}",
-        preview_url="",
         filename=f"{media_id}.jpg",
         width=100,
         height=200,

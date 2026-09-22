@@ -1,8 +1,4 @@
-from PyInstaller.utils.hooks import collect_data_files, collect_submodules
-
-
-hiddenimports = collect_submodules("playwright")
-datas = collect_data_files("playwright") + [
+datas = [
     ("../LICENSE", "."),
     ("../Logo.png", "."),
     ("../THIRD_PARTY_NOTICES.md", "."),
@@ -13,7 +9,7 @@ gui = Analysis(
     pathex=[".."],
     binaries=[],
     datas=datas,
-    hiddenimports=hiddenimports,
+    hiddenimports=[],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
@@ -49,7 +45,7 @@ worker = Analysis(
     pathex=[".."],
     binaries=[],
     datas=datas,
-    hiddenimports=hiddenimports,
+    hiddenimports=[],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],

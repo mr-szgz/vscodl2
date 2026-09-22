@@ -15,13 +15,12 @@ window = MainWindow()
 window.handle_event(
     {
         "type": "scanned",
-        "scan_path": "data/scans/-evalee.json",
+        "scan_path": "data/scans/fixture.json",
         "items": [
             {
                 "media_id": f"fixture-{number:02d}",
                 "media_type": "Video" if number == 3 else "Image",
                 "url": f"https://media.test/fixture-{number:02d}.jpg",
-                "preview_url": f"https://media.test/fixture-{number:02d}.jpg",
                 "filename": f"fixture-{number:02d}.jpg",
                 "width": 2048,
                 "height": 1365,

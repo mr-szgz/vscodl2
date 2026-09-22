@@ -100,8 +100,6 @@ QPushButton[fluentAppearance="primary"]:pressed {
     background: @brand_pressed; border-color: @brand_pressed;
 }
 QPushButton[fluentAppearance="subtle"] { background: transparent; border-color: transparent; }
-QCheckBox { spacing: 8px; }
-QCheckBox::indicator { width: 18px; height: 18px; }
 QTableView {
     background: @canvas_background; alternate-background-color: @surface_secondary;
     border: 1px solid @border_subtle; border-radius: 6px; gridline-color: @border_subtle;
