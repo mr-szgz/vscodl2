@@ -4,7 +4,7 @@
 #define MyAppId "VSCODL2.desktop"
 #define MyDistDir "..\dist\VSCODL2"
 #ifndef MyAppVersion
-  #define MyAppVersion "2.2.2"
+  #define MyAppVersion "2.2.3"
 #endif
 
 [Setup]

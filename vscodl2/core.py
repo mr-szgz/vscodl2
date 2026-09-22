@@ -50,7 +50,7 @@ class MediaItem:
             filename=f"{payload['upload_date']}_{media_id}_original{suffix}",
             width=payload["width"],
             height=payload["height"],
-            captured_at=payload["capture_date_ms"],
+            captured_at=payload["upload_date"],
             description=payload["description"],
         )
 
@@ -68,7 +68,7 @@ class MediaItem:
             filename=f"{payload['uploadDate']}_{media_id}_original{suffix}",
             width=payload["width"],
             height=payload["height"],
-            captured_at=payload["captureDateMs"],
+            captured_at=payload["uploadDate"],
             description=payload["description"],
         )
 
@@ -84,23 +84,24 @@ class MediaItem:
 @dataclass(frozen=True)
 class Job:
     gallery_url: str
-    data_dir: str
+    config_dir: str
+    download_dir: str
 
     @property
-    def data_path(self):
-        return Path(self.data_dir)
+    def config_path(self):
+        return Path(self.config_dir)
 
     @property
     def profile_path(self):
-        return self.data_path / "browser-profile"
+        return self.config_path / "browser-profile"
 
     @property
     def scan_path(self):
-        return self.data_path / "scans" / f"{gallery_name(self.gallery_url)}.json"
+        return self.config_path / "scans" / f"{gallery_name(self.gallery_url)}.json"
 
     @property
     def download_path(self):
-        return self.data_path / gallery_name(self.gallery_url)
+        return Path(self.download_dir) / gallery_name(self.gallery_url)
 
 
 class Control:
@@ -206,7 +207,7 @@ def wait_for_debugging_port(port):
 
 
 def scan_gallery(job, emit, control):
-    job.data_path.mkdir(parents=True, exist_ok=True)
+    job.config_path.mkdir(parents=True, exist_ok=True)
     job.profile_path.mkdir(parents=True, exist_ok=True)
     captured = {}
     completed = deque()

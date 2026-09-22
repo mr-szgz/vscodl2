@@ -1,6 +1,6 @@
 datas = [
     ("../LICENSE", "."),
-    ("../Logo.png", "."),
+    ("../assets/Logo.png", "."),
     ("../THIRD_PARTY_NOTICES.md", "."),
 ]
 

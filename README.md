@@ -8,15 +8,24 @@ Complete site verification yourself before starting an automatic gallery scan.
 
 ## Files
 
-Browser profile data, scan manifests, and downloads are stored below `./data`:
+The download folder is configurable in the app and defaults to the system Downloads folder:
 
 ```text
-data/
-  browser-profile/
-  scans/
+Downloads/VSCODL2/
   <username>/
     photo/
     video/
+```
+
+Settings, browser profile data, scan manifests, and logs are stored below the system user configuration folder returned by `platformdirs.user_config_path("VSCODL2", appauthor=False)`:
+
+```text
+VSCODL2/
+  settings.json
+  browser-profile/
+  scans/
+  browser-console.log
+  last-error.log
 ```
 
 ## Run from source

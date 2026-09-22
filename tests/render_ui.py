@@ -15,7 +15,7 @@ window = MainWindow()
 window.handle_event(
     {
         "type": "scanned",
-        "scan_path": "data/scans/fixture.json",
+        "scan_path": "user-config/VSCODL2/scans/fixture.json",
         "items": [
             {
                 "media_id": f"fixture-{number:02d}",

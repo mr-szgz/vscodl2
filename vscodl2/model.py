@@ -8,7 +8,7 @@ from .core import MediaItem
 
 
 class MediaTableModel(QAbstractTableModel):
-    HEADERS = ("Type", "Media ID", "Dimensions", "Captured", "Description")
+    HEADERS = ("Type", "Media ID", "Dimensions", "Uploaded", "Description")
 
     def __init__(self, parent=None):
         super().__init__(parent)

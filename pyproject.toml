@@ -4,13 +4,14 @@ build-backend = "hatchling.build"
 
 [project]
 name = "vscodl2"
-version = "2.2.2"
+version = "2.2.3"
 description = "A Qt and Playwright desktop downloader for user-controlled VSCO gallery sessions"
 readme = "README.md"
 license = "MIT"
 license-files = ["LICENSE"]
 requires-python = ">=3.12"
 dependencies = [
+    "platformdirs>=4.3,<5",
     "playwright>=1.55,<2",
     "pyside6>=6.8,<7",
     "requests>=2.32,<3",

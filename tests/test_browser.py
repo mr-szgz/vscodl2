@@ -35,7 +35,6 @@ class GalleryHandler(BaseHTTPRequestHandler):
                         "video_url": "",
                         "responsive_url": f"{origin}/asset.png",
                         "upload_date": 1700000000000,
-                        "capture_date_ms": 1690000000000,
                         "width": 1920,
                         "height": 1080,
                         "description": "API fixture",
@@ -90,7 +89,7 @@ def start_gallery_server():
 @pytest.mark.browser
 def test_real_chrome_loads_image_captures_api_and_restores_own_profile(tmp_path):
     server, gallery = start_gallery_server()
-    job = core.Job(gallery, str(tmp_path))
+    job = core.Job(gallery, str(tmp_path), str(tmp_path / "downloads"))
 
     for _ in range(2):
         control = core.Control()
@@ -130,7 +129,10 @@ def test_real_chrome_loads_image_captures_api_and_restores_own_profile(tmp_path)
 @pytest.mark.browser
 def test_qt_open_and_confirm_buttons_drive_real_browser_worker(qtbot, tmp_path, monkeypatch):
     server, gallery = start_gallery_server()
-    monkeypatch.chdir(tmp_path)
+    config_dir = tmp_path / "config"
+    config_dir.mkdir()
+    monkeypatch.setattr("vscodl2.app.user_config_path", lambda *args, **kwargs: config_dir)
+    monkeypatch.setattr("vscodl2.app.user_downloads_path", lambda: tmp_path / "Downloads")
     window = MainWindow()
     qtbot.addWidget(window)
     window.url.setText(gallery)

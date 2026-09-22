@@ -8,6 +8,7 @@ from PySide6.QtCore import QProcess, QProcessEnvironment, QUrl
 from PySide6.QtGui import QDesktopServices, QIcon
 from PySide6.QtWidgets import (
     QApplication,
+    QFileDialog,
     QFrame,
     QHBoxLayout,
     QHeaderView,
@@ -22,6 +23,7 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
     QWidget,
 )
+from platformdirs import user_config_path, user_downloads_path
 
 from .core import gallery_name
 from .model import MediaTableModel
@@ -38,8 +40,14 @@ def set_fluent_property(widget, name, value):
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.data_dir = (Path.cwd() / "data").resolve()
-        self.data_dir.mkdir(parents=True, exist_ok=True)
+        self.config_dir = user_config_path("VSCODL2", appauthor=False, ensure_exists=True)
+        self.settings_path = self.config_dir / "settings.json"
+        if self.settings_path.is_file():
+            settings = json.loads(self.settings_path.read_text(encoding="utf-8"))
+            self.download_dir = Path(settings["download_directory"])
+        else:
+            self.download_dir = user_downloads_path() / "VSCODL2"
+            self.save_settings()
         self.worker = QProcess(self)
         self.worker.setProcessChannelMode(QProcess.ProcessChannelMode.SeparateChannels)
         self.worker.readyReadStandardOutput.connect(self._read_stdout)
@@ -95,6 +103,25 @@ class MainWindow(QMainWindow):
         source_row.addWidget(self.url, 1)
         source_row.addWidget(self.open_button)
         session_layout.addLayout(source_row)
+
+        download_row = QHBoxLayout()
+        download_label = QLabel("Download folder")
+        self.download_directory = QLineEdit(str(self.download_dir))
+        self.download_directory.setReadOnly(True)
+        self.download_directory.setAccessibleName("Download folder")
+        self.download_directory.setAccessibleDescription(
+            "Folder where downloaded VSCO galleries are saved"
+        )
+        download_label.setBuddy(self.download_directory)
+        self.browse_downloads_button = QPushButton("Browse…")
+        self.browse_downloads_button.setAccessibleDescription(
+            "Choose the folder where downloaded VSCO galleries are saved"
+        )
+        self.browse_downloads_button.clicked.connect(self.choose_download_directory)
+        download_row.addWidget(download_label)
+        download_row.addWidget(self.download_directory, 1)
+        download_row.addWidget(self.browse_downloads_button)
+        session_layout.addLayout(download_row)
 
         self.message_bar = QFrame()
         self.message_bar.setProperty("fluentRole", "messageBar")
@@ -184,7 +211,9 @@ class MainWindow(QMainWindow):
 
         self.setCentralWidget(root)
         QWidget.setTabOrder(self.url, self.open_button)
-        QWidget.setTabOrder(self.open_button, self.confirm_button)
+        QWidget.setTabOrder(self.open_button, self.download_directory)
+        QWidget.setTabOrder(self.download_directory, self.browse_downloads_button)
+        QWidget.setTabOrder(self.browse_downloads_button, self.confirm_button)
         QWidget.setTabOrder(self.confirm_button, self.cancel_button)
         QWidget.setTabOrder(self.cancel_button, self.table)
         QWidget.setTabOrder(self.table, self.download_button)
@@ -193,8 +222,26 @@ class MainWindow(QMainWindow):
     def job(self):
         return {
             "gallery_url": self.url.text().strip(),
-            "data_dir": str(self.data_dir),
+            "config_dir": str(self.config_dir),
+            "download_dir": str(self.download_dir),
         }
+
+    def save_settings(self):
+        self.settings_path.write_text(
+            json.dumps({"download_directory": str(self.download_dir)}, indent=2) + "\n",
+            encoding="utf-8",
+        )
+
+    def choose_download_directory(self):
+        directory = QFileDialog.getExistingDirectory(
+            self,
+            "Choose download folder",
+            str(self.download_dir),
+        )
+        if directory:
+            self.download_dir = Path(directory)
+            self.download_directory.setText(directory)
+            self.save_settings()
 
     def start_worker(self, request):
         self.stdout_buffer = ""
@@ -203,7 +250,7 @@ class MainWindow(QMainWindow):
         self.error_details.hide()
         self.copy_error_button.hide()
         if request["operation"] == "scan":
-            (self.data_dir / "browser-console.log").write_text("", encoding="utf-8")
+            (self.config_dir / "browser-console.log").write_text("", encoding="utf-8")
         if getattr(sys, "frozen", False):
             self.worker.setProgram(str(Path(sys.executable).with_name("VSCODL2-worker.exe")))
             self.worker.setArguments([])
@@ -223,6 +270,8 @@ class MainWindow(QMainWindow):
         self.download_button.setEnabled(False)
         self.open_button.setEnabled(False)
         self.url.setEnabled(False)
+        self.download_directory.setEnabled(False)
+        self.browse_downloads_button.setEnabled(False)
         self.cancel_button.setEnabled(True)
         self.confirm_button.setEnabled(False)
         self.set_status("Opening Google Chrome and navigating to the gallery…", "info")
@@ -240,6 +289,8 @@ class MainWindow(QMainWindow):
         self.download_button.setEnabled(False)
         self.table.setEnabled(False)
         self.open_button.setEnabled(False)
+        self.download_directory.setEnabled(False)
+        self.browse_downloads_button.setEnabled(False)
         self.cancel_button.setEnabled(True)
         self.progress.setRange(0, len(items))
         self.progress.setValue(0)
@@ -277,7 +328,7 @@ class MainWindow(QMainWindow):
             self.error_details.appendPlainText(entry)
             self.error_details.show()
             self.copy_error_button.show()
-            with (self.data_dir / "browser-console.log").open("a", encoding="utf-8") as log:
+            with (self.config_dir / "browser-console.log").open("a", encoding="utf-8") as log:
                 log.write(entry + "\n")
             if event["level"] == "error":
                 self.set_status(entry, "danger")
@@ -308,12 +359,14 @@ class MainWindow(QMainWindow):
         self.cancel_button.setEnabled(False)
         self.open_button.setEnabled(True)
         self.url.setEnabled(True)
+        self.download_directory.setEnabled(True)
+        self.browse_downloads_button.setEnabled(True)
         self.table.setEnabled(True)
         if exit_code:
             self.error_details.setPlainText(self.stderr_buffer)
             self.error_details.show()
             self.copy_error_button.show()
-            log_path = self.data_dir / "last-error.log"
+            log_path = self.config_dir / "last-error.log"
             log_path.write_text(self.stderr_buffer, encoding="utf-8")
             self.set_status(f"Operation failed (exit {exit_code}). Full error below; saved to {log_path}", "danger")
             self.captured_label.setText("Operation stopped")
@@ -326,7 +379,7 @@ class MainWindow(QMainWindow):
         set_fluent_property(self.message_bar, "fluentSeverity", severity)
 
     def download_path(self):
-        return self.data_dir / gallery_name(self.url.text().strip())
+        return self.download_dir / gallery_name(self.url.text().strip())
 
     def open_downloads(self):
         path = self.download_path()

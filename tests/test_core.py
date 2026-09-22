@@ -46,6 +46,14 @@ def test_media_item_from_image_api():
     assert item.media_type == "Image"
     assert item.url == "https://im.vsco.test/media/abc123.jpg"
     assert item.filename == "1700000000000_abc123_original.jpg"
+    assert item.captured_at == 1700000000000
+
+
+def test_media_item_from_api_does_not_require_capture_date():
+    entry = api_entry()
+    del entry["image"]["capture_date_ms"]
+
+    assert MediaItem.from_api(entry).captured_at == 1700000000000
 
 
 def test_media_item_from_video_api():
@@ -94,7 +102,7 @@ def test_download_media_uses_username_photo_directory(tmp_path):
         description="",
     )
     events = []
-    job = Job("https://vsco.co/fixture/gallery", str(tmp_path))
+    job = Job("https://vsco.co/fixture/gallery", str(tmp_path / "config"), str(tmp_path))
 
     download_media(job, [asdict(item)], events.append, Control())
     server.shutdown()
@@ -118,7 +126,7 @@ def test_download_media_uses_video_directory_and_skips_existing_file(tmp_path):
         captured_at=1700000000000,
         description="",
     )
-    job = Job("https://vsco.co/fixture/gallery", str(tmp_path))
+    job = Job("https://vsco.co/fixture/gallery", str(tmp_path / "config"), str(tmp_path))
     destination = tmp_path / "fixture" / "video" / "fixture_original.mp4"
     destination.parent.mkdir(parents=True)
     destination.write_bytes(b"existing video")
@@ -163,6 +171,7 @@ def test_preloaded_photo_and_video_keep_source_resolution():
     item = MediaItem.from_preloaded("abc", photo)
     assert item.url == "https://image.vsco.co/1/abc/photo.jpg"
     assert (item.width, item.height) == (4032, 3024)
+    assert item.captured_at == 1700000000000
     photo.update(isVideo=True, videoUrl="//video.vsco.co/abc.mp4?token=x%2Fy")
     video = MediaItem.from_preloaded("abc", photo)
     assert video.url == "https://video.vsco.co/abc.mp4?token=x%2Fy"
@@ -224,7 +233,7 @@ def test_scan_collects_preloaded_and_api_once_without_extra_requests(tmp_path, m
     monkeypatch.setattr(core.subprocess, "Popen", launch_chrome)
     monkeypatch.setattr(core, "available_debugging_port", lambda: 12345)
     monkeypatch.setattr(core, "wait_for_debugging_port", lambda port: None)
-    job = Job(gallery, str(tmp_path))
+    job = Job(gallery, str(tmp_path), str(tmp_path / "downloads"))
     core.scan_gallery(job, events.append, control)
     manifest = json.loads(job.scan_path.read_text())
     assert {item["media_id"] for item in manifest["items"]} == {"abc123", "preloaded"}

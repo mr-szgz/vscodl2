@@ -32,7 +32,6 @@ class Handler(BaseHTTPRequestHandler):
                         "video_url": "",
                         "responsive_url": f"{origin}/asset.png",
                         "upload_date": 1700000000000,
-                        "capture_date_ms": 1690000000000,
                         "width": 1920,
                         "height": 1080,
                         "description": "Frozen API fixture",
@@ -77,7 +76,15 @@ def main():
     gallery = f"http://127.0.0.1:{server.server_port}/fixture/gallery"
 
     with tempfile.TemporaryDirectory(prefix="vscodl2-frozen-smoke-") as directory:
-        request = {"operation": "scan", "job": {"gallery_url": gallery, "data_dir": directory}, "items": None}
+        request = {
+            "operation": "scan",
+            "job": {
+                "gallery_url": gallery,
+                "config_dir": directory,
+                "download_dir": str(Path(directory) / "downloads"),
+            },
+            "items": None,
+        }
         process = subprocess.Popen(
             [worker], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
             text=True, encoding="utf-8",
