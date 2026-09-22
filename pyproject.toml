@@ -1,0 +1,37 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "vscodl2"
+version = "2.2.0"
+description = "A Qt and Playwright desktop downloader for user-controlled VSCO gallery sessions"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.12"
+dependencies = [
+    "playwright>=1.55,<2",
+    "pyside6>=6.8,<7",
+    "requests>=2.32,<3",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=8", "pytest-qt>=4.4"]
+
+[project.gui-scripts]
+vscodl2 = "vscodl2.app:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["vscodl2"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+qt_api = "pyside6"
+addopts = "-m 'not browser'"
+markers = ["browser: local integration tests using installed Google Chrome"]
+
+[dependency-groups]
+dev = [
+    "pyinstaller>=6.16,<7",
+]
