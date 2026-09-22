@@ -1,3 +1,5 @@
+<img src="assets/Logo.png" alt="VSCODL2" style="max-width: 640px; width: 100%;">
+
 # VSCODL2
 
 VSCODL2 is a Windows desktop application for scanning and downloading VSCO galleries. The interface is native Qt; the browser session is a visible Google Chrome window controlled by Playwright.
